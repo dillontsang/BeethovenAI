@@ -22,12 +22,12 @@ class ChordProgressionGenerator:
             
         self._start_symbols = ["/"] * SEQUENCE_LENGTH
         
-    def generate_melody(self, seed, num_steps, max_sequence_length, temperature):
+    def generate_chord_progression(self, seed, num_steps, max_sequence_length, temperature):
         # "64 _ 63 _ _ "
         
         # create seed with start symbol
         seed = seed.split()
-        melody = seed
+        chordProgression = seed
         seed = self._start_symbols + seed
         
         # map seed to int
@@ -60,9 +60,9 @@ class ChordProgressionGenerator:
                 break
             
             # update the melody
-            melody.append(output_symbol)
+            chordProgression.append(output_symbol)
             
-        return melody
+        return chordProgression
             
             
     def _sample_with_temperature(self, probabilities, temperature):
@@ -80,53 +80,9 @@ class ChordProgressionGenerator:
         return index
     
         
-    '''def save_melody(self, melody, step_duration = 0.25, format = "mid", file_name = "mel.midi"):
-        
-        # create a music21 stream
-        stream = m21.stream.Stream()
-        
-        # parse all the symbols in the melody and create note/rest objects
-        # 60 _ _ _ r _ 62 _
-        start_symbol = None
-        step_counter = 1
-        
-        for i, symbol in enumerate(melody):
-            
-            # handle case in which we have a note/rest
-            if symbol != "_" or i + 1 == len(melody):
-                
-                # ensure we're not dealing with note/rest beyond the first symbol
-                if start_symbol is not None:
-                    
-                    quarter_length_duration = step_duration * step_counter # 0.25 * 4
-                    
-                    # handle rest
-                    if start_symbol == "r":
-                        m21_event = m21.note.Rest(quarterLength = quarter_length_duration)
-                    
-                    # handle note
-                    else:
-                        m21_event = m21.note.Note(int(start_symbol), quarterLength = quarter_length_duration)
-                    
-                    stream.append(m21_event)
-                    
-                    # reset step counter
-                    step_counter = 1
-                    
-                start_symbol = symbol
-            
-            # handle case in which we have a prolongation sign "_"
-            else:
-                step_counter += 1
-            
-        # write the m21 stream to a midi file
-        stream.write(format, file_name)'''
-        
 if __name__ == "__main__":
     cpg = ChordProgressionGenerator()
-    seed = "i _ _ _ V65 _ _ _ i _ ii _ I64 _ V7 _ I _ _ _"
-    melody = cpg.generate_melody(seed, 500, SEQUENCE_LENGTH, 0.4)
-    print(melody)
+    seed = "I _ _ _ V65/vi _ _ _ vi _ _ _ V43/V _ _ _ V _ _ _ V7 _ V42 _ I6 _ _ _ IV _ vii=7/V _ I64 _ _ _ V _ _ _ I _ _ _"
     
-    
-    # cpg.save_melody(melody)        
+    chordProgression = cpg.generate_chord_progression(seed, num_steps, max_sequence_length, temperature)(seed, 500, SEQUENCE_LENGTH, 1)
+    print(chordProgression)      

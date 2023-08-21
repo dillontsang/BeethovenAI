@@ -4,31 +4,52 @@ Created on Aug 17, 2023
 @author: dillontsang
 '''
 from music21 import *
+import itertools
 
 # Define the chord progression
-symbol_chord_progression = ['i', '_', '_', '_', 'V65', '_', '_', '_', 'i', '_', 'ii', '_', 'I64', '_', 'V7', '_', 'I', '_', 
-                            '_', '_', 'i', '_', '_', '_', 'V43/VI', '_', '_', '_', 'VI', 'i64', 'vii-7', 'V65', 'i', '_', 
-                            'ii=65', '_', 'i64', '_', 'V', '_', 'i', '_', 'V/iv', '_', 'N6', '_', '_', '_', 'V/iv', '_', 
-                            '_', '_', 'N6', '_', '_', '_', 'V/iv', '_', 'iv', '_', 'V65/III', '_', '_', 'III', 'VI65', 'ii-', 
-                            'V65', 'i', 'ii=43', '_', 'i64', 'ii=65', 'i64', '_', 'V7', '_', 'i', '_', '_', '_', 'V65', '_', 
-                            '_', '_', 'i', '_', '_', '_', 'V7', '_', '_', '_', 'i', '_', '_', '_', 'V7', '_', '_', '_', 'i', 
-                            '_', '_', '_']
+symbol_chord_progression = ['I', '_', '_', 'I6', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', 'V7/IV', '_', '_', 'IV', 
+                            '_', '_', 'IV6', '_', '_', 'ii7', '_', '_', 'V65', '_', '_', 'I', '_', '_', 'I6', '_', '_', 'V7', '_', 
+                            '_', 'I', '_', '_', 'I6', '_', '_', '_', 'ii65', 'V43/IV', 'IV6', '_', '_', '_', '_', 'V43/IV', 'IV', 
+                            '_', 'V65/V', 'V', '_', 'V7', 'I', '_', '_', '_', '_', 'V7', 'I6', '_', '_', '_', 'ii', 'I64', 'IV6', 
+                            '_', '_', '_', '_', 'I64', 'ii65', '_', 'V65/V', 'V', '_', 'V7', 'I', '_', '_', '_', '_', 'I6', 'ii65', '_', 
+                            'V65/V', 'V', '_', 'V7', 'I', '_', '_', 'ii65', '_', '_', 'I6', '_', '_', 'V43', '_', '_', 'I', '_', '_', 
+                            'ii65', '_', '_', 'I6', '_', '_', 'V43', '_', '_', 'I', '_', '_', 'ii65', '_', '_', 'I6', '_', '_', 'V43', 
+                            '_', '_', 'I', '_', '_', 'V43', '_', '_', 'I', '_', '_', '_', '_', '_', '_', 
+                            '_', '_', '_', '_', '_', 'V7/vi', '_', '_', 'vi', '_', '_', 'V7/vi', '_', '_', 'vi', '_', '_', 'V7/ii', '_', 
+                            '_', 'ii', '_', '_', 'I64', '_', 'V7', 'I', '_', '_', 'V/vi', '_', '_', 'vi', '_', '_', 'V/vi', '_', '_', 'vi', 
+                            '_', '_', 'ii6', '_', '_', 't+6', '_', '_', 'V', '_', '_', '_', '_', 't+6', 'V', '_', 't+6', 'V', '_', 't+6', 
+                            'V', '_', '_', '_', '_', 'iii7', 'vii-43', '_', 'iii7', 'vii-43', '_', 'iii7', 'vii-43', '_', '_', '_', '_', 
+                            '_', 'V43', '_', 'vii=7/ii', 'V43', '_', 'vii=7/ii', 'V43', '_', '_', '_', '_', '_', 'I', '_', 'V43', 'I', '_', 
+                            'V43/vi', 'vi', '_', '_', '_', '_', 'V43/vi', 'vi', '_', 'V43/vi', 'vi', '_', 'V43/IV', 'IV', '_', '_', '_', '_', 
+                            'V43/IV', 'IV', '_', 'V43/IV', 'IV', '_', 'V43', 'I6', '_', 'V6', 'I', '_', 'IV6', 'I6', '_', '_', '_', '_', 
+                            '_', 'vii-6/V', '_', '_', '_', '_', '_', 'I64', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_']
+
+
 chord_progression = []
 
 def roman_to_int(roman):
         roman_numerals = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7,
-                      'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7}
+                      'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7
+                      }
 
         return roman_numerals.get(roman, roman)
 
-def analyze_chord_symbol(chord_symbol):
+def analyze_chord_symbol(chord_symbol, index, duration_check):
           
     roman_numeral_end = 0
     triad_or_seventh = 0
     inversion_end = 0
     inversion = 0
     secondary_dominant_numeral = 0
-        
+    duration = 1
+    
+    for i in range(index + 1, len(duration_check)):
+        if duration_check[i] == '_':
+            duration += 1
+        else:
+            break
+     
+    
     if chord_symbol == "_":
         return "", "", "", "", ""
 
@@ -45,6 +66,7 @@ def analyze_chord_symbol(chord_symbol):
     
     remainder = chord_symbol[roman_numeral_end:]
     
+    
     # check quality
     if(chord_symbol[0].isupper()):
         quality = 'M'
@@ -59,18 +81,20 @@ def analyze_chord_symbol(chord_symbol):
             quality = 'd'
             remainder = chord_symbol[roman_numeral_end + 1:]
         elif remainder[0] == '=':
-            quality = 'hd'
+            quality = 'hd7'
             remainder = chord_symbol[roman_numeral_end + 1:]
+    
     
     # check inversion
     if remainder != "":
         if remainder[:2].isdigit():
             inversion_end = 2
-        elif remainder[:1].isalpha():
+            
+        elif remainder[:1].isdigit():
             inversion_end = 1
-        
     else:
         inversion = 0
+        
         
     if remainder != "":
         # triads chordorseventh = 0
@@ -94,99 +118,276 @@ def analyze_chord_symbol(chord_symbol):
             inversion = 3
             triad_or_seventh = 1
             
-    # deal with dominant
-        if quality == 'M' and triad_or_seventh == 1:
-            quality = 'D'
+    # deal with dominant, major seventh, and fully diminished for seventh chords
+    if quality == 'M' and triad_or_seventh == 1:
+        quality = 'M7'
+        if roman_numeral == 'V':
+            quality = 'D7'
+    elif quality == 'm' and triad_or_seventh == 1:
+        quality = 'm7'
+    elif quality == 'd' and triad_or_seventh == 1:
+        quality = 'fd7'
             
-    # secondary dominant
+    # deal with secondary dominant
     if remainder[inversion_end:] != "":
         secondary_dominant_numeral = remainder[inversion_end + 1:]
         
+    # deal with special chords
+    if(str(roman_to_int(chord_symbol[0])).isalpha()):
+        if(chord_symbol[0] == "N"):
+            quality = 'N'
+            inversion = 1
+            roman_numeral = 'II'
+        
+        # italian 6th
+        elif(chord_symbol[0] == "t"):
+            quality = 'I'
+            inversion = 2
+            roman_numeral = 'I'
+            
+        elif(chord_symbol[0] == "F"):
+            quality = 'F7'
+            inversion = 3
+            roman_numeral = 'I'
+            
+        elif(chord_symbol[0] == "G"):
+            quality = 'G7'
+            inversion = 3
+            roman_numeral = 'I'
+            
+        secondary_dominant_numeral = ""
     
+    print("chord symbol: " + chord_symbol)
+    print()
     print("roman numeral: " + str(roman_to_int(roman_numeral)))
     print("quality: " + str(quality))
     print("inversion: " + str(inversion))
-    print("chord or seventh: " + str(triad_or_seventh))
     print("secondary dominant roman numeral: " + str(roman_to_int(secondary_dominant_numeral)))
+    print("duration: " + str(duration))
     print()
-    return roman_numeral, quality, inversion, triad_or_seventh, secondary_dominant_numeral
+    return roman_to_int(roman_numeral), quality, inversion, roman_to_int(secondary_dominant_numeral), duration
 
+
+def note_to_midi(scale_degree):
+    # Convert a note name or scale degree to its corresponding MIDI value
+    c_major_scale = [60, 62, 64, 65, 67, 69, 71, 72]
     
-def chord_to_midi(chord_name):
-        note_mapping = {
-            'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63,
-            'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68,
-            'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71
-        }
-        root_note = chord_name[:-1]
-        chord_type = chord_name[-1]
-        
-        root_midi = note_mapping.get(root_note)
-        if root_midi is None:
-            return None
-        
+    if 1 <= scale_degree <= 7:
+        return c_major_scale[scale_degree - 1]
+    else:
+        raise ValueError("Scale degree must be between 1 and 7")
+    
+    
+def chord_to_midi(degree, quality, inversion, secondary_dominant_numeral):
+    
+        # deal with secondary dominant
+        if secondary_dominant_numeral != "" and secondary_dominant_numeral != 0:
+            degree = degree + int(secondary_dominant_numeral)
+            if degree > 8:
+                degree -= 8
+            elif degree == 8:
+                degree = 1
+                
+        # Major, Minor, Diminished, Augmented, 
+        # Dominant, Major 7th, Minor 7th, Half Diminished, Fully Diminished
+        # Neapolitan chord, italian chord, french chord, german chord
         chord_intervals = {
             'M': [0, 4, 7],
             'm': [0, 3, 7],
-            '7': [0, 4, 7, 10],
+            'd': [0, 3, 6],
+            'a': [0, 4, 8],
+            'D7': [0, 4, 7, 10],
+            'M7': [0, 4, 7, 11],
+            'm7': [0, 3, 7, 10],
+            'fd7': [0, 3, 6, 9],
+            'hd7': [0, 3, 6, 10],
+            'N': [-1, 3, 6],
+            'I': [0, 6, 8],
+            'F7': [0, 2, 6, 8],
+            'G7': [0, 3, 6, 8]
             # Add more chord types and intervals as needed
         }
         
-        intervals = chord_intervals.get(chord_type)
-        if intervals is None:
-            return None
+        root_midi = note_to_midi(degree)
+        intervals = chord_intervals[quality]
         
-        chord_midi = [root_midi + interval for interval in intervals]
-        return chord_midi
+        chord_midi_values = [root_midi + interval for interval in intervals]
+        chord_midi_values = chord_midi_values[inversion:] + chord_midi_values[:inversion]
+        
+        return chord_midi_values
 
 
+# get number closest to target given list
+def closest_number(notes, target):
+    closest = None
+    min_difference = float('inf')
+
+    for note in notes:
+        difference = abs(note - target)
+        if difference < min_difference:
+            min_difference = difference
+            closest = note
+
+    return closest
+
+def choose_alto_and_tenor(alto_and_tenor_choices):
+    sums = []
+    
+    # get combinations of alto and tenor choices
+    combinations = list(itertools.combinations(alto_and_tenor_choices, 2))
+    
+    # pick combinations of alto and tenor notes centered around their voicings
+    distances = [(abs(max(x, y) - 62), abs(min(x, y) - 55)) for x, y in combinations]
+    
+    for x, y in distances:
+        distance_sum = x + y
+        sums.append(distance_sum)
+    
+    indexed_sums = [(value, index) for index, value in enumerate(sums)]
+    indexed_sums.sort()
+    indexes_of_best_scores = [index for value, index in indexed_sums]
+    
+    sorted_choices = [combinations[i] for i in indexes_of_best_scores]
+    
+    # try not to have same note in alto and tenor
+    for x, y in sorted_choices:
+        alto_note = note.Note(max(x, y))
+        tenor_note = note.Note(min(x, y))
+        if not ((alto_note.pitch.midi - tenor_note.pitch.midi) % 12 == 0): 
+            return alto_note, tenor_note
+    
+    # worst case scenario
+    first_choice = sorted_choices[0]
+    alto_note = note.Note(max(first_choice))
+    tenor_note = note.Note(min(first_choice))
+            
+    return alto_note, tenor_note
+    
 # Define the four-part harmonization rules
 
-def harmonize_chord(chord):
+def harmonize_chord(chord, soprano_midi, quality):
+    soprano_choices = []
+    alto_and_tenor_choices = []
+    bass_choices = []
+    
+    unused_chord_members = []
+    half_used_chord_members = []
+    double = 0
+    
+    if quality[-1] == '7':
+        for i in range(-3, 1):
+            unused_chord_members.append(chord[i].name)
+    else:
+        for i in range(-2, 1):
+            unused_chord_members.append(chord[i].name)
+    
+    
+    # temporary assignment of voices
     soprano_note = chord[-1]
-    alto_note = chord[-2]
-    tenor_note = chord[-3]
     bass_note = chord[0]
     
+    # get bass note
+    for x in range(3):
+        bass_choices.append(bass_note.pitch.midi - (x*12))
+    
+    bass_note.pitch = pitch.Pitch(closest_number(bass_choices, 50))
+    
+    # doubling rules for bass
+    if quality[-1] == '7':
+        unused_chord_members = [item for item in unused_chord_members if item != bass_note.name]     
+    else:
+        if not (bass_note.name == 'C' or bass_note.name == 'F' or bass_note.name == 'G'):
+            unused_chord_members = [item for item in unused_chord_members if item != bass_note.name]
+            
+        else:
+            half_used_chord_members.append(bass_note.name)
+    
+    # get soprano note
+    if quality[-1] == '7':
+        for i in range(-3, 0):
+            for j in range(-2, 3):
+                soprano_choices.append(chord[i].pitch.midi - (j*12))
+    else:
+        if len(half_used_chord_members) > 0: 
+            for i in range (-2, 1):
+                for j in range(-2, 3):
+                    soprano_choices.append(chord[i].pitch.midi - (j*12))
+        else: 
+            for i in range (-2, 0):
+                for j in range(-2, 3):
+                    soprano_choices.append(chord[i].pitch.midi - (j*12))
+                    
+    filtered_soprano_choices = [value for value in soprano_choices if (64 <= value <= 80)]
+    
+    soprano_note.pitch = pitch.Pitch(closest_number(filtered_soprano_choices, soprano_midi))
+    
+    # doubling rules for soprano
+    if quality[-1] == '7':
+        unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]     
+    else:
+        if soprano_note.name == bass_note.name:
+            unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
+            double += 1
+            half_used_chord_members.pop(0)
+        elif not (soprano_note.name == 'C' or soprano_note.name == 'F' or soprano_note.name == 'G'):
+            unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
+        else: 
+            half_used_chord_members.append(soprano_note.name)
+    
+    
+    '''print("unused chord members:", end =" ")
+    print(unused_chord_members)
+    print("half used chord members:", end =" ")
+    print(half_used_chord_members)
+    print("double: " + str(double))'''
+    print ("-" * 80)  
+    
+    # alto choices
+    for i in range(len(unused_chord_members)):
+        for j in range(-2, 3):
+            alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
+            
+    alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
+                     
     return soprano_note, alto_note, tenor_note, bass_note
 
-
 def main():
-    
-    for symbol in symbol_chord_progression:
-        # print(symbol)
-        roman_numeral, quality, inversion, triad_or_seventh, secondary_dominant_numeral = analyze_chord_symbol(symbol)
-        
-        # chord_progression.append()
     
     # Create a stream for the four parts   
     soprano = stream.Part()
     alto = stream.Part()
     tenor = stream.Part()
     bass = stream.Part()
+    index = 0
     
     # Create a MIDI file and add the four parts
     midi_stream = stream.Score()
     
-    for chord_name in chord_progression:
-        print(chord_to_midi(chord_name))
+    soprano_midi = 72
+    
+    for chord_name in symbol_chord_progression:
         
+        degree, quality, inversion, secondary_dominant_numeral, duration = analyze_chord_symbol(chord_name, index, symbol_chord_progression)
         
-        soprano_note, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(chord_name)))
-        print(soprano_note)
-        print(alto_note)
-        print(tenor_note)
-        print(bass_note)
+        if quality != "":
+            # set notes
+            soprano_note, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral)), soprano_midi, quality)
+            
+            # smooth melody line
+            soprano_midi = soprano_note.pitch.midi
+            
+            # set note lengths
+            soprano_note.quarterLength = duration
+            alto_note.quarterLength = duration
+            tenor_note.quarterLength = duration
+            bass_note.quarterLength = duration
+            
+            soprano.append(soprano_note)
+            alto.append(alto_note)
+            tenor.append(tenor_note)
+            bass.append(bass_note)
         
-        soprano_note.duration.type = 'quarter'
-        alto_note.duration.type = 'quarter'
-        tenor_note.duration.type = 'quarter'
-        bass_note.duration.type = 'quarter'
-        
-        soprano.append(soprano_note)
-        alto.append(alto_note)
-        tenor.append(tenor_note)
-        bass.append(bass_note)
+        index += 1
     
     # Add the parts to the MIDI stream
     midi_stream.insert(0, soprano)
