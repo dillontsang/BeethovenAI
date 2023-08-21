@@ -10,7 +10,7 @@ from beethovenchordprogressionpreprocess import SEQUENCE_LENGTH, MAPPING_PATH
 
 class ChordProgressionGenerator:
     
-    def __init__(self, model_path="beethovenodel.h5"):
+    def __init__(self, model_path="beethovenmodel.h5"):
         
         self.model_path = model_path
         self.model = keras.models.load_model(model_path)
