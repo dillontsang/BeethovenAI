@@ -3,14 +3,9 @@ Created on Aug 18, 2023
 
 @author: dillontsang
 '''
-'''
-Created on Jul 31, 2023
 
-@author: dillontsang
-'''
 import os
 import json
-import music21 as m21
 import numpy as np
 import tensorflow.keras as keras
 import csv

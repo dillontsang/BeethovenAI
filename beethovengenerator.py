@@ -6,9 +6,7 @@ Created on Aug 18, 2023
 import json
 import numpy as np
 import tensorflow.keras as keras
-import music21 as m21
 from beethovenchordprogressionpreprocess import SEQUENCE_LENGTH, MAPPING_PATH
-from pickle import NONE
 
 class ChordProgressionGenerator:
     
