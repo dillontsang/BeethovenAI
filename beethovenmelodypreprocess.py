@@ -1,5 +1,5 @@
 '''
-Created on Aug 18, 2023
+Created on Aug 21, 2023
 
 @author: dillontsang
 '''
@@ -10,87 +10,106 @@ import numpy as np
 import tensorflow.keras as keras
 import csv
 
-CSV_DATASET_PATH = "beethovenchorddataset"
-SAVE_DIR = "beethoven_chord_progression_dataset"
-MAPPING_PATH = "beethovenchordmapping.json"
-SEQUENCE_LENGTH = 16
+CSV_DATASET_PATH = "beethovenmelodydataset"
+FILTERED_CSV_DATASET_PATH = "filteredbeethovenmelodydataset"
+SAVE_DIR = "beethoven_melody_dataset"
+MAPPING_PATH = "melodymapping.json"
+SEQUENCE_LENGTH = 64
 
+# durations expressed in quarter length
+ACCEPTABLE_DURATIONS = [
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2,
+    3,
+    4
+]
 
-def load_songs_in_csv(dataset_path):
+def remove_bad_durations(dataset_path, filtered_dataset_path, acceptable_durations):
     
-    chords = []
-    measures = []
+    i = 0
     
-    # go through all the files in dataset and load chords and measures
+    # go through all the files in dataset and remove anything that doesnt fit in acceptable durations
     for filename in os.listdir(dataset_path):
+        output_file_name = str(i) + '.csv' 
+        output_file_path = os.path.join(filtered_dataset_path, output_file_name)
         if filename.endswith('.csv'):
             csv_file_path = os.path.join(dataset_path, filename)
             with open(csv_file_path, 'r', newline='') as csvfile:
                 csv_reader = csv.reader(csvfile)
+                rows = list(csv_reader)
+                
+            filtered_rows = [row for row in rows if float(row[3]) in acceptable_durations]
+            print(filtered_rows)
+                
+            with open(output_file_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(filtered_rows)
+
+        i += 1
+        
+def load_songs_in_csv(filtered_dataset_path):
+    
+    notes = []
+    durations = []
+    
+    # go through all the files in dataset and load notes and durations
+    for filename in os.listdir(filtered_dataset_path):
+        if filename.endswith('.csv'):
+            csv_file_path = os.path.join(filtered_dataset_path, filename)
+            with open(csv_file_path, 'r', newline='') as csvfile:
+                csv_reader = csv.reader(csvfile)
                 for row in csv_reader:
                     if row:
-                        # cannot compare if not int
-                        measures.append(int(row[0]))
-                        chords.append(row[6])       
-    return chords, measures
+                        notes.append(row[1])
+                        durations.append(row[3])
+        notes.append('/')
+        durations.append('/')    
+    return notes, durations
 
-def encode_song(chords, measures, sequence_length, time_step = 1):
+def encode_song(notes, durations, sequence_length, time_step = 0.25):
+    # p = 60, d = 1.0 -> [60, "_", "_", "_"]
     
     encoded_song = []
-    chord_number = 0
+    note_number = 0
     new_song_delimiter = "/ " * sequence_length
     
-    switch_indices_list = []
-    for i in range(1, len(measures) - 1):
-            if measures[i] < measures[i - 1]:
-                switch_indices_list.append(i)
-
-    print(switch_indices_list)
-    
-    
-    for event in chords:
-        chord_number += 1
-        symbol = event
+    for event in notes:
+        midi = event
         
-        # convert the chords into time series notation
+        # convert the melody into time series notation
         
-        if(chord_number == len(measures)) or (is_number_in_array(chord_number, switch_indices_list)):
-            print(chord_number)
-            steps = 4
-            for step in range(steps):
-                if step == 0:
-                    encoded_song.append(symbol)
-                else:
-                    encoded_song.append("_")
-                    
-               
+        if(event == '/'):
             encoded_song.append(new_song_delimiter)
-            
         else:
-            
-            steps = int((int(float(measures[chord_number])) - int(float(measures[chord_number - 1])) / time_step))
+            steps = int(float(durations[note_number]) / time_step)
             for step in range(steps):
                 if step == 0:
-                    encoded_song.append(symbol)
+                    encoded_song.append(midi)
                 else:
                     encoded_song.append("_")
+        
+        note_number += 1
         
         
     encoded_song = encoded_song[:-1]
+    # cast encoded song to a string
     encoded_song = " ".join(map(str, encoded_song))
     
     return encoded_song
 
-def preprocess(dataset_path):
+def preprocess(filtered_dataset_path):
     pass
 
-    # load the chords and measures
+    # load the songs
     print("Loading songs...")
-    chords, measures = load_songs_in_csv(dataset_path)
+    notes, durations = load_songs_in_csv(filtered_dataset_path)
     
-    # encode songs with music time series representation
-    encoded_song = encode_song(chords, measures, SEQUENCE_LENGTH)
-        
+    encoded_song = encode_song(notes, durations, SEQUENCE_LENGTH)
+   
     # save songs to text file
     save_path = os.path.join(SAVE_DIR)
     with open(save_path, "w") as fp:
@@ -159,11 +178,11 @@ def generate_training_sequences(sequence_length):
     
     return inputs, targets
     
-def is_number_in_array(number, arr):
-    return number in arr
-    
+
 def main():
-    # preprocess(CSV_DATASET_PATH)
+    # remove_bad_durations(CSV_DATASET_PATH, FILTERED_CSV_DATASET_PATH, ACCEPTABLE_DURATIONS)
+    # preprocess(FILTERED_CSV_DATASET_PATH)
+    
     songs = load(SAVE_DIR)
     # create_mapping(songs, MAPPING_PATH)
     # inputs, targets = generate_training_sequences(SEQUENCE_LENGTH)
