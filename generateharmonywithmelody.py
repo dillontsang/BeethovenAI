@@ -27,8 +27,6 @@ symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 
                             'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I64', 'V', 'I', '_', 
                             '_', '_']
 
-chord_progression = []
-
 def roman_to_int(roman):
         roman_numerals = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7,
                       'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7
@@ -321,6 +319,8 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
                     
     filtered_soprano_choices = [value for value in soprano_choices if (60 <= value <= 80)]
     
+    # generate soprano melody
+    
     mg = MelodyGenerator()
     
     soprano_melody, soprano_note_midi = mg.generate_melody_to_match_chord_progression(soprano_seed, SEQUENCE_LENGTH, duration, filtered_soprano_choices, 0.3)
@@ -340,12 +340,11 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
         else: 
             half_used_chord_members.append(soprano_note.name)
     
-    # alto choices
+    # alto and tenor choices
     for i in range(len(unused_chord_members)):
         for j in range(-2, 3):
             alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
             
-    # filtered_alto_and_tenor_choices = [pitch for pitch in alto_and_tenor_choices if pitch < soprano_note_midi]
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
                      
@@ -434,7 +433,7 @@ def main():
     index = 0
     step_duration = 0.25
     
-    # Create a MIDI file and add the four parts
+    # Create a XML file and add the four parts
     xml_stream = stream.Score()
     
     for chord_name in symbol_chord_progression:
@@ -450,15 +449,15 @@ def main():
             else:
                 soprano_seed = get_soprano_seed(soprano, soprano_beginning_seed)
                 
-            # set notes
+            # set notes and soprano melody
             soprano_melody, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral)), soprano_seed, quality, duration)
             
             # set note lengths
-    
             alto_note.quarterLength = duration
             tenor_note.quarterLength = duration
             bass_note.quarterLength = duration
             
+            # add chord under bass note
             bass_note.lyric = chord_name
             
             # append soprano melody
@@ -501,13 +500,13 @@ def main():
         
         index += 1
     
-    # Add the parts to the MIDI stream
+    # Add the parts to the XML stream
     xml_stream.insert(0, soprano)
     xml_stream.insert(0, alto)
     xml_stream.insert(0, tenor)
     xml_stream.insert(0, bass)
     
-    # Save the MIDI file
+    # Save the XML file
     xml_stream.write('xml', fp='harmonywithmelody.xml')
 
 if __name__ == "__main__":

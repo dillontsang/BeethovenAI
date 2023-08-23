@@ -9,7 +9,6 @@ import tensorflow.keras as keras
 import music21 as m21
 import random
 from preprocess import SEQUENCE_LENGTH, MAPPING_PATH
-# from beethovenmelodypreprocess import SEQUENCE_LENGTH, MAPPING_PATH
 from pickle import NONE
 
 class MelodyGenerator:
@@ -120,13 +119,15 @@ class MelodyGenerator:
         return cut_melody, soprano_note
     
     def _sample_with_soprano_choices(self, probabilities, soprano_choices):
+        
+        # takes valid soprano options, picks whichever one the AI favors the most
+        
         soprano_choices_string = list(map(str, soprano_choices))
         
         soprano_choices_mapped = [self._mappings[note] for note in soprano_choices_string]
         
         highest_index = soprano_choices_mapped[0]
         highest_value = probabilities[highest_index]
-        
         
         for index in soprano_choices_mapped:
             if index >= len(probabilities):
@@ -150,15 +151,12 @@ class MelodyGenerator:
         predictions = np.log(probabilities) / temperature
         probabilities = np.exp(predictions) / np.sum(np.exp(predictions))
             
-        choices = range(len(probabilities)) # [0, 1, 2, 3]
-        
-        # index = np.random.choice(choices, p = probabilities)
+        choices = range(len(probabilities))
         
         index = np.random.choice(choices, p = probabilities)
         index_symbol = [k for k, v in self._mappings.items() if v == index][0]
         
         chances = 0
-        
         
         # make sure doesnt return / because / signals end of piece
         while index_symbol == "/":
@@ -168,7 +166,7 @@ class MelodyGenerator:
             
             if (chances >= 50):
                 # choose a random c major note
-                c_major_scale = [64, 65, 67, 69, 71, 72, 74, 76]
+                c_major_scale = [65, 67, 69, 71, 72, 74, 76]
                 scale_string = list(map(str, c_major_scale))
                 scale_mapped = [self._mappings[note] for note in scale_string]
                 

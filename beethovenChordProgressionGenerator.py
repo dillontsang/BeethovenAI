@@ -21,7 +21,6 @@ class ChordProgressionGenerator:
         self._start_symbols = ["/"] * SEQUENCE_LENGTH
         
     def generate_chord_progression(self, seed, num_steps, max_sequence_length, temperature):
-        # "64 _ 63 _ _ "
         
         # create seed with start symbol
         seed = seed.split()
@@ -53,11 +52,11 @@ class ChordProgressionGenerator:
             # map int to our encoding
             output_symbol = [k for k, v in self._mappings.items() if v == output_int][0]
             
-            # check whether we're at the end of a melody
+            # check whether we're at the end of a chord progression
             if output_symbol == "/":
                 break
             
-            # update the melody
+            # update the chord progression
             chordProgression.append(output_symbol)
             
         return chordProgression

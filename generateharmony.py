@@ -45,10 +45,6 @@ symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 
                             'V', '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 
                             'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'I', '_', '_', '_']
 
-
-
-chord_progression = []
-
 def roman_to_int(roman):
         roman_numerals = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7,
                       'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7
@@ -356,15 +352,7 @@ def harmonize_chord(chord, soprano_midi, quality):
         else: 
             half_used_chord_members.append(soprano_note.name)
     
-    
-    '''print("unused chord members:", end =" ")
-    print(unused_chord_members)
-    print("half used chord members:", end =" ")
-    print(half_used_chord_members)
-    print("double: " + str(double))'''
-    print ("-" * 80)  
-    
-    # alto choices
+    # alto and tenor choices
     for i in range(len(unused_chord_members)):
         for j in range(-2, 3):
             alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
@@ -382,7 +370,7 @@ def main():
     bass = stream.Part()
     index = 0
     
-    # Create a MIDI file and add the four parts
+    # Create a XML file and add the four parts
     xml_stream = stream.Score()
     
     soprano_midi = 72
@@ -404,6 +392,7 @@ def main():
             tenor_note.quarterLength = duration
             bass_note.quarterLength = duration
             
+            # add chord under bass note
             bass_note.lyric = chord_name
             
             soprano.append(soprano_note)
@@ -413,13 +402,13 @@ def main():
         
         index += 1
     
-    # Add the parts to the MIDI stream
+    # Add the parts to the XML stream
     xml_stream.insert(0, soprano)
     xml_stream.insert(0, alto)
     xml_stream.insert(0, tenor)
     xml_stream.insert(0, bass)
     
-    # Save the MIDI file
+    # Save the XML file
     xml_stream.write('xml', fp='harmony.xml')
 
 if __name__ == "__main__":
