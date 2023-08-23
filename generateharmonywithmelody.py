@@ -156,6 +156,8 @@ def analyze_chord_symbol(chord_symbol, index, duration_check):
             roman_numeral = 'I'
             
         secondary_dominant_numeral = ""
+        
+    # TODO: Flat seven and fix italian chord
     
     print("chord symbol: " + chord_symbol)
     print()
@@ -191,6 +193,7 @@ def chord_to_midi(degree, quality, inversion, secondary_dominant_numeral):
         # Major, Minor, Diminished, Augmented, 
         # Dominant, Major 7th, Minor 7th, Half Diminished, Fully Diminished
         # Neapolitan chord, italian chord, french chord, german chord
+        # TODO: add flat seven
         chord_intervals = {
             'M': [0, 4, 7],
             'm': [0, 3, 7],
