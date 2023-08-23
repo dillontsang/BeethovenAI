@@ -5,9 +5,12 @@ Created on Aug 17, 2023
 '''
 from music21 import *
 import itertools
+from melodygenerator import MelodyGenerator, SEQUENCE_LENGTH
+
+# soprano seed to start song
+soprano_beginning_seed = "60 _ 64 _ _ 65 64 _ 60 _ 64 _"
 
 # Define the chord progression
-
 symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 
                             'IV6', '_', 'ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', '_', '_', 'I', '_', 
                             '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', '_', 
@@ -22,30 +25,7 @@ symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 
                             'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 'V', '_', '_', '_', 'I6', 'V42', 
                             'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 'V65', 'I', '_', '_', 
                             'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I64', 'V', 'I', '_', 
-                            '_', '_', 'V43', '_', '_', '_', 'I', '_', '_', '_', 'V65', '_', '_', '_', 'I', 
-                            '_', '_', '_', 'V43/ii', '_', '_', '_', 'ii6', '_', 'V65/V', '_', 'V7', '_', 
-                            '_', '_', 'I64', '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V', 
-                            'I64', 'V', 'I64', 'V', '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', 
-                            '_', 'V42', 'I6', 'V64', 'I', 'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'ii6', 
-                            '_', 'I6', '_', 'ii6', '_', 'I64', 'V', 'I', '_', '_', '_', 'V43', '_', '_', '_', 
-                            'I', '_', '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', 
-                            '_', 'IV', '_', 'I64', 'V7', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 
-                            'I64', 'V', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 'I64', 'V', 'I', 
-                            '_', 'V42', '_', 'I', '_', 'V42', '_', 'I', 'V42', 'I', 'V42', 'I', '_', '_', '_', 
-                            'I', '_', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 'I', 'V42/IV', 'vi7', 'V65', 
-                            'I', '_', '_', '_', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 'I', 'V42/IV', 'vi7', 
-                            'V65', 'I', '_', 'ii6', '_', '_', '_', 'I6', '_', '_', '_', 'IV', '_', 'V', '_', 'I', 
-                            '_', '_', '_', 'ii6', '_', '_', '_', 'V65/V', '_', '_', '_', 'V7', '_', '_', '_', 'I64', 
-                            '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 'V', 
-                            '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 
-                            'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'V', '_', 
-                            'I', '_', '_', '_', 'V43', '_', '_', '_', 'I', '_', '_', '_', 'V65', '_', '_', '_', 'I', 
-                            '_', '_', '_', 'V43/ii', '_', '_', '_', 'ii6', '_', 'V65/V', '_', 'V7', '_', '_', '_', 
-                            'I64', '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 
-                            'V', '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 
-                            'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'I', '_', '_', '_']
-
-
+                            '_', '_']
 
 chord_progression = []
 
@@ -287,7 +267,8 @@ def choose_alto_and_tenor(alto_and_tenor_choices):
     
 # Define the four-part harmonization rules
 
-def harmonize_chord(chord, soprano_midi, quality):
+# duration in quarter notes
+def harmonize_chord(chord, soprano_seed, quality, duration):
     soprano_choices = []
     alto_and_tenor_choices = []
     bass_choices = []
@@ -304,8 +285,7 @@ def harmonize_chord(chord, soprano_midi, quality):
             unused_chord_members.append(chord[i].name)
     
     
-    # temporary assignment of voices
-    soprano_note = chord[-1]
+    # temporary assignment of bass voice
     bass_note = chord[0]
     
     # get bass note
@@ -341,7 +321,11 @@ def harmonize_chord(chord, soprano_midi, quality):
                     
     filtered_soprano_choices = [value for value in soprano_choices if (60 <= value <= 80)]
     
-    soprano_note.pitch = pitch.Pitch(closest_number(filtered_soprano_choices, soprano_midi))
+    mg = MelodyGenerator()
+    
+    soprano_melody, soprano_note_midi = mg.generate_melody_to_match_chord_progression(soprano_seed, SEQUENCE_LENGTH, duration, filtered_soprano_choices, 0.3)
+    
+    soprano_note = note.Note(soprano_note_midi)
     
     # doubling rules for soprano
     if quality[-1] == '7':
@@ -356,23 +340,90 @@ def harmonize_chord(chord, soprano_midi, quality):
         else: 
             half_used_chord_members.append(soprano_note.name)
     
-    
-    '''print("unused chord members:", end =" ")
-    print(unused_chord_members)
-    print("half used chord members:", end =" ")
-    print(half_used_chord_members)
-    print("double: " + str(double))'''
-    print ("-" * 80)  
-    
     # alto choices
     for i in range(len(unused_chord_members)):
         for j in range(-2, 3):
             alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
             
+    # filtered_alto_and_tenor_choices = [pitch for pitch in alto_and_tenor_choices if pitch < soprano_note_midi]
+            
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
                      
-    return soprano_note, alto_note, tenor_note, bass_note
+    return soprano_melody, alto_note, tenor_note, bass_note
+    
+def reverse_numbers_in_string(seed):
+    
+    new_string = ""
+    current_number = ""
 
+    for char in seed:
+        if char.isdigit():
+            current_number += char
+        else:
+            if current_number:
+                if len(current_number) == 2:
+                    new_string += current_number[::-1]
+                else:
+                    new_string += current_number
+                current_number = ""
+            new_string += char
+
+    if current_number and len(current_number) == 2:
+        new_string += current_number[::-1]
+    else:
+        new_string += current_number
+
+    return new_string
+
+def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
+    
+    # get last 64 sixteenth note events for melodygenerator to get next notes
+    
+    seed = []
+    seed_length = 0
+    total_steps = 0
+    
+    for event in reversed(soprano.flat.notesAndRests):
+        if isinstance(event, note.Note):
+            symbol = event.pitch.midi # 60
+            # handle rests
+        elif isinstance(event, note.Rest):
+            symbol = "r"
+            
+            # convert the note/rest into time series notation
+        steps = int(event.duration.quarterLength / time_step)
+        seed_length += steps
+        
+        if seed_length < SEQUENCE_LENGTH:
+            for step in range(steps):
+                if step == (steps - 1):
+                    seed.append(symbol)
+                else:
+                    seed.append("_")
+        else:
+            for step in range(SEQUENCE_LENGTH - total_steps):
+                if step == SEQUENCE_LENGTH - total_steps - 1:
+                    seed.append(symbol)
+                else:
+                    seed.append("_")
+            reversed_encoded_seed = " ".join(map(str, seed))
+            
+            encoded_seed = reverse_numbers_in_string(reversed_encoded_seed[::-1])
+            
+            return encoded_seed
+            
+        total_steps += steps
+        
+    reversed_encoded_seed = " ".join(map(str, seed))
+            
+    encoded_seed = reverse_numbers_in_string(reversed_encoded_seed[::-1])
+    
+    # append starting seed to encoded seed if encoded seed is not long enough
+    if(total_steps < SEQUENCE_LENGTH):
+        encoded_seed = ' '.join([soprano_seed, encoded_seed])
+    
+    return encoded_seed
+                    
 def main():
     
     # Create a stream for the four parts   
@@ -381,32 +432,69 @@ def main():
     tenor = stream.Part()
     bass = stream.Part()
     index = 0
+    step_duration = 0.25
     
     # Create a MIDI file and add the four parts
     xml_stream = stream.Score()
     
-    soprano_midi = 72
-    
     for chord_name in symbol_chord_progression:
         
+            
         degree, quality, inversion, secondary_dominant_numeral, duration = analyze_chord_symbol(chord_name, index, symbol_chord_progression)
         
         if quality != "":
-            # set notes
-            soprano_note, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral)), soprano_midi, quality)
             
-            # smooth melody line
-            soprano_midi = soprano_note.pitch.midi
+            # set seed
+            if index == 0:
+                soprano_seed = soprano_beginning_seed
+            else:
+                soprano_seed = get_soprano_seed(soprano, soprano_beginning_seed)
+                
+            # set notes
+            soprano_melody, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral)), soprano_seed, quality, duration)
             
             # set note lengths
-            soprano_note.quarterLength = duration
+    
             alto_note.quarterLength = duration
             tenor_note.quarterLength = duration
             bass_note.quarterLength = duration
             
             bass_note.lyric = chord_name
             
-            soprano.append(soprano_note)
+            # append soprano melody
+            start_symbol = None
+            step_counter = 1
+            
+            soprano_melody.append("/")
+            
+            for i, symbol in enumerate(soprano_melody): 
+                # handle case in which we have a note/rest
+                if symbol != "_" or i + 1 == len(soprano_melody):
+                    # ensure we're not dealing with note/rest beyond the first symbol
+                    if start_symbol is not None: 
+                        quarter_length_duration = step_duration * step_counter # 0.25 * 4
+                        
+                        # handle rest
+                        if start_symbol == "r":
+                            m21_event = note.Rest(quarterLength = quarter_length_duration)
+                        
+                        # handle note
+                        else:
+                            m21_event = note.Note(int(start_symbol), quarterLength = quarter_length_duration)
+                        
+                        soprano.append(m21_event)
+                        
+                        # reset step counter
+                        step_counter = 1
+                        
+                    start_symbol = symbol
+                # handle case in which we have a prolongation sign "_"
+                else:
+                    step_counter += 1
+            
+            print ("-" * 80) 
+                
+            # append other voices
             alto.append(alto_note)
             tenor.append(tenor_note)
             bass.append(bass_note)
@@ -420,7 +508,7 @@ def main():
     xml_stream.insert(0, bass)
     
     # Save the MIDI file
-    xml_stream.write('xml', fp='harmony.xml')
+    xml_stream.write('xml', fp='harmonywithmelody.xml')
 
 if __name__ == "__main__":
     main()
