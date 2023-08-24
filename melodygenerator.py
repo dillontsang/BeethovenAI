@@ -165,24 +165,22 @@ class MelodyGenerator:
             chances += 1
             
             if (chances >= 50):
-                # choose most probable c major note
-                c_major_scale = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79]
-                scale_string = list(map(str, c_major_scale))
-                scale_mapped = [self._mappings[note] for note in scale_string]
+                # choose second most probable event
                 
-                highest_index = scale_mapped[0]
-                highest_value = probabilities[highest_index]
+                highest = second_highest = float('-inf')
+                highest_index = second_highest_index = -1
                 
-                for scale_note in scale_mapped:
-                    if scale_note >= len(probabilities):
-                        continue  # Skip invalid indexes
-        
-                    num = probabilities[scale_note]
-                    if num > highest_value:
-                        highest_value = num
-                        highest_index = scale_note
-            
-                index = highest_index
+                for i, num in enumerate(probabilities):
+                    if num > highest:
+                        second_highest = highest
+                        second_highest_index = highest_index
+                        highest = num
+                        highest_index = i
+                    elif num > second_highest:
+                        second_highest = num
+                        second_highest_index = i
+                
+                index = second_highest_index
                 index_symbol = [k for k, v in self._mappings.items() if v == index][0]
                 
         return index
