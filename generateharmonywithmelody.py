@@ -467,6 +467,7 @@ def main():
             start_symbol = None
             step_counter = 1
             
+            # signal end of each chord so soprano melody ends correctly
             soprano_melody.append("/")
             
             for i, symbol in enumerate(soprano_melody): 
