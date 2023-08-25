@@ -202,7 +202,7 @@ def chord_to_midi(degree, quality, inversion, secondary_dominant_numeral):
     
         # deal with secondary dominant
         if secondary_dominant_numeral != "" and secondary_dominant_numeral != 0:
-            degree = degree + int(secondary_dominant_numeral)
+            degree = degree + int(secondary_dominant_numeral) - 1
             if degree > 8:
                 degree -= 8
             elif degree == 8:
