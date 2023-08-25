@@ -357,7 +357,7 @@ def harmonize_chord(chord, soprano_midi, quality):
     
     # alto and tenor choices
     for i in range(len(unused_chord_members)):
-        for j in range(-2, 3):
+        for j in range(-2, 2):
             alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
