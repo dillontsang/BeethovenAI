@@ -276,7 +276,6 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     
     unused_chord_members = []
     half_used_chord_members = []
-    double = 0
     
     if quality[-1] == '7':
         for i in range(-3, 1):
@@ -336,7 +335,6 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     else:
         if soprano_note.name == bass_note.name:
             unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
-            double += 1
             half_used_chord_members.pop(0)
         elif not (soprano_note.name == 'C' or soprano_note.name == 'F' or soprano_note.name == 'G'):
             unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
