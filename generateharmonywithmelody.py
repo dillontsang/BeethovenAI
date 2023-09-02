@@ -313,18 +313,15 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
         for i in range(-3, 0):
             for j in range(-2, 3):
                 soprano_choices.append(chord[i].pitch.midi + (j*12))
-                print(soprano_choices)
     else:
         if len(half_used_chord_members) > 0: 
             for i in range (-2, 1):
                 for j in range(-2, 3):
                     soprano_choices.append(chord[i].pitch.midi + (j*12))
-                    print(soprano_choices)
         else: 
             for i in range (-2, 0):
                 for j in range(-2, 3):
                     soprano_choices.append(chord[i].pitch.midi + (j*12))
-                    print(soprano_choices)
                     
     filtered_soprano_choices = [value for value in soprano_choices if (60 <= value <= 80)]
     
