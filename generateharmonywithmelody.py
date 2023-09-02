@@ -455,7 +455,8 @@ def main():
                 soprano_seed = get_soprano_seed(soprano, soprano_beginning_seed)
                 
             # set notes and soprano melody
-            soprano_melody, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral)), soprano_seed, quality, duration)
+            chord_notes = chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral))
+            soprano_melody, alto_note, tenor_note, bass_note = harmonize_chord(chord_notes, soprano_seed, quality, duration)
             
             # set note lengths
             alto_note.quarterLength = duration
