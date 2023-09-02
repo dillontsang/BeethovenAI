@@ -482,9 +482,6 @@ def fix_range(soprano_melody):
         return altered_soprano_melody
     
     return soprano_melody
-    
-        
-    #return altered_soprano_melody
                     
 def main():
     
