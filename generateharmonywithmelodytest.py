@@ -574,7 +574,7 @@ def main():
     xml_stream.insert(0, bass)
     
     # Save the XML file
-    xml_stream.write('xml', fp='harmonywithmelody.xml')
+    xml_stream.write('xml', fp='harmonywithalteredmelody.xml')
 
 if __name__ == "__main__":
     main()
