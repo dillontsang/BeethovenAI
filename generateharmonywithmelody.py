@@ -294,7 +294,7 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     bass_note = chord[0]
     
     # get bass note
-    for x in range(3):
+    for x in range(4):
         bass_choices.append(bass_note.pitch.midi - (x*12))
     
     # get closest note to BF2
