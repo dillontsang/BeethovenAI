@@ -326,16 +326,19 @@ def harmonize_chord(chord, soprano_midi, quality):
     if quality[-1] == '7':
         for i in range(-3, 0):
             for j in range(-2, 3):
-                soprano_choices.append(chord[i].pitch.midi - (j*12))
+                soprano_choices.append(chord[i].pitch.midi + (j*12))
+            
     else:
         if len(half_used_chord_members) > 0: 
             for i in range (-2, 1):
                 for j in range(-2, 3):
-                    soprano_choices.append(chord[i].pitch.midi - (j*12))
+                    soprano_choices.append(chord[i].pitch.midi + (j*12))
+                    
         else: 
             for i in range (-2, 0):
                 for j in range(-2, 3):
-                    soprano_choices.append(chord[i].pitch.midi - (j*12))
+                    soprano_choices.append(chord[i].pitch.midi + (j*12))
+                    
                     
     filtered_soprano_choices = [value for value in soprano_choices if (60 <= value <= 80)]
     
@@ -356,10 +359,10 @@ def harmonize_chord(chord, soprano_midi, quality):
     # alto and tenor choices
     for i in range(len(unused_chord_members)):
         for j in range(-2, 2):
-            alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
+            alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
-                     
+                
     return soprano_note, alto_note, tenor_note, bass_note
 
 def main():

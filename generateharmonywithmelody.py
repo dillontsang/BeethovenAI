@@ -9,9 +9,13 @@ from melodygenerator import MelodyGenerator, SEQUENCE_LENGTH
 
 # soprano seed to start song
 soprano_beginning_seed = "60 _ 64 _ _ 65 64 _ 60 _ 64 _"
+# 67 _ 72 _ _ _ 69 _ 67 _ _ _ 64 _ 62 _ _ _ 64 _ 65 _ _ _ 67 _ 64 _ _ _ 62 _ 60 _ _ _"
+
 
 # Define the chord progression
-symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 
+symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I']
+
+'''symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 
                             'IV6', '_', 'ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', '_', '_', 'I', '_', 
                             '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', '_', 
                             'IV', '_', 'I64', 'V7', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 
@@ -25,7 +29,7 @@ symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 
                             'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 'V', '_', '_', '_', 'I6', 'V42', 
                             'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 'V65', 'I', '_', '_', 
                             'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I64', 'V', 'I', '_', 
-                            '_', '_']
+                            '_', '_']'''
 
 def roman_to_int(roman):
         roman_numerals = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7,
@@ -308,16 +312,19 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     if quality[-1] == '7':
         for i in range(-3, 0):
             for j in range(-2, 3):
-                soprano_choices.append(chord[i].pitch.midi - (j*12))
+                soprano_choices.append(chord[i].pitch.midi + (j*12))
+                print(soprano_choices)
     else:
         if len(half_used_chord_members) > 0: 
             for i in range (-2, 1):
                 for j in range(-2, 3):
-                    soprano_choices.append(chord[i].pitch.midi - (j*12))
+                    soprano_choices.append(chord[i].pitch.midi + (j*12))
+                    print(soprano_choices)
         else: 
             for i in range (-2, 0):
                 for j in range(-2, 3):
-                    soprano_choices.append(chord[i].pitch.midi - (j*12))
+                    soprano_choices.append(chord[i].pitch.midi + (j*12))
+                    print(soprano_choices)
                     
     filtered_soprano_choices = [value for value in soprano_choices if (60 <= value <= 80)]
     
@@ -343,8 +350,8 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     
     # alto and tenor choices
     for i in range(len(unused_chord_members)):
-        for j in range(-2,2):
-            alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi - (j*12))
+        for j in range(-2, 2):
+            alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
             
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
