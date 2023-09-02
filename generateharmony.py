@@ -385,7 +385,8 @@ def main():
         
         if quality != "":
             # set notes
-            soprano_note, alto_note, tenor_note, bass_note = harmonize_chord(chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral)), soprano_midi, quality)
+            chord_notes = chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral))
+            soprano_note, alto_note, tenor_note, bass_note = harmonize_chord(chord_notes, soprano_midi, quality)
             
             # smooth melody line
             soprano_midi = soprano_note.pitch.midi
