@@ -280,6 +280,7 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     
     unused_chord_members = []
     half_used_chord_members = []
+    double = 0
     
     if quality[-1] == '7':
         for i in range(-3, 1):
@@ -296,7 +297,8 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     for x in range(3):
         bass_choices.append(bass_note.pitch.midi - (x*12))
     
-    bass_note.pitch = pitch.Pitch(closest_number(bass_choices, 48))
+    # get closest note to BF2
+    bass_note.pitch = pitch.Pitch(closest_number(bass_choices, 46))
     
     # doubling rules for bass
     if quality[-1] == '7':
@@ -339,11 +341,19 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
     else:
         if soprano_note.name == bass_note.name:
             unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
+            double += 1
             half_used_chord_members.pop(0)
         elif not (soprano_note.name == 'C' or soprano_note.name == 'F' or soprano_note.name == 'G'):
             unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
         else: 
             half_used_chord_members.append(soprano_note.name)
+            
+    # fix some doubling rules
+    if double == 0:
+        if quality[-1] != '7':
+            if len(unused_chord_members) == 1:
+                if not (bass_note.name == 'C' or bass_note.name == 'F' or bass_note.name == 'G'):
+                    unused_chord_members.append(bass_note.name)
     
     # alto and tenor choices
     for i in range(len(unused_chord_members)):
