@@ -151,31 +151,32 @@ def analyze_chord_symbol(chord_symbol, index, duration_check):
         secondary_dominant_numeral = remainder[inversion_end + 1:]
         
     # deal with special chords
-    if(str(roman_to_int(chord_symbol[0])).isalpha()):
-        if(chord_symbol[0] == "N"):
-            quality = 'N'
-            inversion = 1
-            roman_numeral = 'II'
+    if len(chord_symbol) > 1:
+        if(str(roman_to_int(chord_symbol[0])).isalpha() or chord_symbol[1] == "t"):
+            if(chord_symbol[0] == "N"):
+                quality = 'N'
+                inversion = 1
+                roman_numeral = 'II'
+            
+            # italian 6th
+            elif(chord_symbol[1] == "t"):
+                quality = 'I'
+                inversion = 2
+                roman_numeral = 'I'
+                
+            elif(chord_symbol[0] == "F"):
+                quality = 'F7'
+                inversion = 3
+                roman_numeral = 'I'
+                
+            elif(chord_symbol[0] == "G"):
+                quality = 'G7'
+                inversion = 3
+                roman_numeral = 'I'
+                
+            secondary_dominant_numeral = ""
         
-        # italian 6th
-        elif(chord_symbol[0] == "t"):
-            quality = 'I'
-            inversion = 2
-            roman_numeral = 'I'
-            
-        elif(chord_symbol[0] == "F"):
-            quality = 'F7'
-            inversion = 3
-            roman_numeral = 'I'
-            
-        elif(chord_symbol[0] == "G"):
-            quality = 'G7'
-            inversion = 3
-            roman_numeral = 'I'
-            
-        secondary_dominant_numeral = ""
-        
-    # TODO: Flat seven and fix italian chord
+    # TODO: Flat seven
     
     print("chord symbol: " + chord_symbol)
     print()

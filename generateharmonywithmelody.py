@@ -137,31 +137,32 @@ def analyze_chord_symbol(chord_symbol, index, duration_check):
         secondary_dominant_numeral = remainder[inversion_end + 1:]
         
     # deal with special chords
-    if(str(roman_to_int(chord_symbol[0])).isalpha()):
-        if(chord_symbol[0] == "N"):
-            quality = 'N'
-            inversion = 1
-            roman_numeral = 'II'
+    if len(chord_symbol) > 1:
+        if(str(roman_to_int(chord_symbol[0])).isalpha() or chord_symbol[1] == "t"):
+            if(chord_symbol[0] == "N"):
+                quality = 'N'
+                inversion = 1
+                roman_numeral = 'II'
+            
+            # italian 6th
+            elif(chord_symbol[1] == "t"):
+                quality = 'I'
+                inversion = 2
+                roman_numeral = 'I'
+                
+            elif(chord_symbol[0] == "F"):
+                quality = 'F7'
+                inversion = 3
+                roman_numeral = 'I'
+                
+            elif(chord_symbol[0] == "G"):
+                quality = 'G7'
+                inversion = 3
+                roman_numeral = 'I'
+                
+            secondary_dominant_numeral = ""
         
-        # italian 6th
-        elif(chord_symbol[0] == "t"):
-            quality = 'I'
-            inversion = 2
-            roman_numeral = 'I'
-            
-        elif(chord_symbol[0] == "F"):
-            quality = 'F7'
-            inversion = 3
-            roman_numeral = 'I'
-            
-        elif(chord_symbol[0] == "G"):
-            quality = 'G7'
-            inversion = 3
-            roman_numeral = 'I'
-            
-        secondary_dominant_numeral = ""
-        
-    # TODO: Flat seven and fix italian chord
+    # TODO: Flat seven
     
     print("chord symbol: " + chord_symbol)
     print()
@@ -427,6 +428,38 @@ def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
         encoded_seed = ' '.join([soprano_seed, encoded_seed])
     
     return encoded_seed
+
+def append_soprano_melody(soprano, soprano_melody, step_duration = 0.25):
+    
+    start_symbol = None
+    step_counter = 1
+    
+    for i, symbol in enumerate(soprano_melody): 
+        # handle case in which we have a note/rest
+        if symbol != "_" or i + 1 == len(soprano_melody):
+            # ensure we're not dealing with note/rest beyond the first symbol
+            if start_symbol is not None: 
+                quarter_length_duration = step_duration * step_counter # 0.25 * 4
+                        
+                # handle rest
+                if start_symbol == "r":
+                    m21_event = note.Rest(quarterLength = quarter_length_duration)
+                        
+                # handle note
+                else:
+                    m21_event = note.Note(int(start_symbol), quarterLength = quarter_length_duration)
+                        
+                soprano.append(m21_event)
+                        
+                # reset step counter
+                step_counter = 1
+                        
+            start_symbol = symbol
+        # handle case in which we have a prolongation sign "_"
+        else:
+            step_counter += 1
+            
+    return soprano
                     
 def main():
     
@@ -436,7 +469,6 @@ def main():
     tenor = stream.Part()
     bass = stream.Part()
     index = 0
-    step_duration = 0.25
     
     # Create a XML file and add the four parts
     xml_stream = stream.Score()
@@ -466,37 +498,11 @@ def main():
             # add chord under bass note
             bass_note.lyric = chord_name
             
-            # append soprano melody
-            start_symbol = None
-            step_counter = 1
-            
             # signal end of each chord so soprano melody ends correctly
             soprano_melody.append("/")
             
-            for i, symbol in enumerate(soprano_melody): 
-                # handle case in which we have a note/rest
-                if symbol != "_" or i + 1 == len(soprano_melody):
-                    # ensure we're not dealing with note/rest beyond the first symbol
-                    if start_symbol is not None: 
-                        quarter_length_duration = step_duration * step_counter # 0.25 * 4
-                        
-                        # handle rest
-                        if start_symbol == "r":
-                            m21_event = note.Rest(quarterLength = quarter_length_duration)
-                        
-                        # handle note
-                        else:
-                            m21_event = note.Note(int(start_symbol), quarterLength = quarter_length_duration)
-                        
-                        soprano.append(m21_event)
-                        
-                        # reset step counter
-                        step_counter = 1
-                        
-                    start_symbol = symbol
-                # handle case in which we have a prolongation sign "_"
-                else:
-                    step_counter += 1
+            # append soprano melody
+            soprano = append_soprano_melody(soprano, soprano_melody)
             
             print ("-" * 80) 
                 
