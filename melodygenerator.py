@@ -7,9 +7,7 @@ import json
 import numpy as np
 import tensorflow.keras as keras
 import music21 as m21
-import random
 from preprocess import SEQUENCE_LENGTH, MAPPING_PATH
-from pickle import NONE
 
 class MelodyGenerator:
     
