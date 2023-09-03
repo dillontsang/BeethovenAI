@@ -55,13 +55,6 @@ symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 
 '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'I', '_', 'V43', '_', 'I', '_', '_', '_', '_', '_', '_', '_', 
 'V42', '_', '_', '_', '_', '_', '_', '_', 'I6', '_', '_', '_', '_', '_', '_', '_', 'I64', 'V7', '_', '_', 'I', '_', '_', '_']'''
 
-
-'''['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 'IV6', '_', 'ii7', '_', 'V65', 
-'_', 'I', '_', 'V65', '_', 'I', '_', 'IV6', '_', '_', '_', 'V65', '_', 'I6', '_', 'V42', '_', 'I', '_', 'V65', 
-'_', 'I', '_', 'I', '_', 'I64', 'V7', 'I', '_', 'I', '_', 'V42', '_', 'I6', '_', 'V65', '_', 'I', '_', 'ii6', 
-'_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'IV6', '_', '_', 
-'_', 'V7', '_', '_', '_', 'I', '_', '_', '_', 'V7', '_', '_', '_', 'I', '_', '_', '_']'''
-
 def roman_to_int(roman):
         roman_numerals = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7,
                       'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7
@@ -475,14 +468,13 @@ def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
                 while number > 72:
                     number -= 12  
                 altered_seed.append(str(number))
-                
             else:
                 altered_seed.append(encoded_seed[i:i + 2])
             i += 2  # Move the index by 2 to skip the processed two-digit number
         else:
             altered_seed.append(encoded_seed[i])
             i += 1  # Move the index by 1 for non-numeric characters
-
+    
     return ''.join(altered_seed)
 
 def fix_range(soprano_melody):
@@ -580,7 +572,8 @@ def main():
                 soprano_seed = soprano_beginning_seed
             else:
                 soprano_seed = get_soprano_seed(soprano, soprano_beginning_seed)
-                
+            
+            
             # set notes and soprano melody
             chord_notes = chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral))
             soprano_melody, alto_note, tenor_note, bass_note = harmonize_chord(chord_notes, soprano_seed, quality, duration)
@@ -602,6 +595,9 @@ def main():
             if chord_index == len(symbol_chord_progression) - duration:
                 altered_soprano_melody = [altered_soprano_melody[0]] + ['_' for _ in range(1, len(altered_soprano_melody))]
                 altered_soprano_melody[-1] = '/'
+            
+            print()
+            print(str(int(float((chord_index + duration) / len(symbol_chord_progression)) * 100)) + "% complete")
             
             # append soprano melody
             soprano = append_soprano_melody(soprano, altered_soprano_melody)
