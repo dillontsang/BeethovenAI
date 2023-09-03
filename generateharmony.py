@@ -176,7 +176,7 @@ def analyze_chord_symbol(chord_symbol, index, duration_check):
                 
             secondary_dominant_numeral = ""
         
-    # TODO: Flat seven
+    # TODO: Flat seven, secondary dominant for special chords
     
     print("chord symbol: " + chord_symbol)
     print()
@@ -311,8 +311,8 @@ def harmonize_chord(chord, soprano_midi, quality):
     for x in range(4):
         bass_choices.append(bass_note.pitch.midi - (x*12))
     
-    # get closest note to BF2
-    bass_note.pitch = pitch.Pitch(closest_number(bass_choices, 46))
+    # get closest note to C3
+    bass_note.pitch = pitch.Pitch(closest_number(bass_choices, 48))
     
     # doubling rules for bass
     if quality[-1] == '7':
