@@ -443,7 +443,7 @@ def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
                     seed.append("_")
             reversed_encoded_seed = " ".join(map(str, seed))
             
-            encoded_seed = reverse_numbers_in_string(reversed_encoded_seed[::-1])
+            encoded_seed = reverse_numbers_in_string(reversed_encoded_seed[::-1])  # @UnusedVariable
             
         total_steps += steps
         
@@ -461,7 +461,6 @@ def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
     while i < len(encoded_seed):
         if encoded_seed[i:i + 2].isdigit():
             number = int(encoded_seed[i:i + 2])
-            print(number)
             if number > 72:
                 number -= 12
                 while number > 72:
