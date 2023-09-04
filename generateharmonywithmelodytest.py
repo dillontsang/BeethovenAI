@@ -473,6 +473,7 @@ def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
             altered_seed.append(encoded_seed[i])
             i += 1  # Move the index by 1 for non-numeric characters
     
+    print(''.join(altered_seed))
     return ''.join(altered_seed)
 
 def fix_range(soprano_melody):
