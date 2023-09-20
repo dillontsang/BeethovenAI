@@ -5,6 +5,16 @@ Created on Aug 17, 2023
 '''
 from music21 import *
 import itertools
+import re
+from melodygenerator import MelodyGenerator, SEQUENCE_LENGTH
+
+# soprano seed to start song
+soprano_beginning_seed = "64 _ _ _ 67 _ 65 _ 65 _ _ _ 62 _ _ _ 62 _ _ _ 64 _ _ _ 64 _ 65 _ 67 _ _ _ 64 _ 62 _"
+# "60 _ 62 _ 62 _ 59 _ 59 _ 60 _ _ _"
+# "60 _ _ _ 60 _ _ _ 62 _ _ _ 62 _ _ _ 64 _ _ _ 62 _ 64 _ 65 _ _ _ 64 _ _ _ 62 _ _ _ 62 _ _ _" # 40
+# "60 _ 64 _ _ 65 64 _ 60 _ 64 _"
+# 67 _ 72 _ _ _ 69 _ 67 _ _ _ 64 _ 62 _ _ _ 64 _ 65 _ _ _ 67 _ 64 _ _ _ 62 _ 60 _ _ _"
+
 
 # Define the chord progression
 
@@ -27,67 +37,35 @@ symbol_chord_progression = ['I', 'ii6', '_', '_', '_', 'V7', '_', '_', '_', 'I',
 'I64', '_', 'V7', '_', 'I64', '_', 'V7', '_', 'I', '_', 'IV', '_', 'I64', '_', 'V7', '_', 'I', 
 '_', 'IV', '_', 'I64', '_', 'V7', '_', 'I', '_', '_', '_']
 
-'''['I', '_', '_', '_', 'V65/vi', '_', '_', '_', 'vi', '_', '_', '_', 'V43/V', '_', '_', '_', 'V', '_', '_', '_', 'V7', '_', 
-'V42', '_', 'I6', '_', '_', '_', 'IV', '_', 'vii=7/V', '_', 'I64', '_', '_', '_', 'V', '_', '_', '_', 'I', '_', '_', '_', 
-'V7', '_', 'I', '_', 'V', '_', 'I', '_', 'V7', '_', 'I', '_', '_', '_', 'V6/III', '_', '_', '_', 'vii-42/V', '_', '_', 'vi6', 
-'vii-6/V', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'iii64', 'vii-6/V', '_', '_', '_', '_', '_', '_', 'vii-42', '_', 
-'ii=65', '_', 'ii=43', '_', 'III+6', '_', 'V42/VII', '_', 'vii-65/ii', '_', 'ii=43', '_', '_', '_', 'V', '_', 'V7', '_', 'V7/V', 
-'_', '_', '_', 'V7', '_', '_', 'vii-7/V', 'I64', '_', '_', 'V7', '_', '_', '_', '_', '_', 'V42', '_', '_', 'V7', '_', '_', '_', 
-'_', '_', 'i6', 'V', '_', '_', 'V6', '_', '_', '_', '_', '_', 'V7', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'V65/ii', 
-'V7', '_', 'ii6', 'I', 'V7', '_', 'I', '_', '_', '_', '_', 'Gr+6', 'V', '_', 'V65/IV', 'V7', 'I', '_', 'iv', '_', 'V7', '_', 'I', 
-'V65', 'I6', 'vi6', 'vii-6', '_', 'VI', '_', '_', 'I6', 'V64', 'I64', 'V65/ii', 'I', 'ii6', 'I6', 'vii=7', 'V6', 'vii-6/V', 'V7', 
-'V43/V', 'I6', '_', 'I6', 'VI6', 'I6', '_', 'I', '_', '_', '_', 'vii-6/V', '_', 'V7', '_', 'I6', '_', 'It+6', '_', 'I64', '_', 
-'V7', '_', '_', '_', 'ii65', '_', 'V6/V', 'V42', 'V/iii', '_', 'ii42', '_', 'i', 'vii-43/V', 'V43', '_', 'i', '_', '_', '_', 'Gr+6', 
-'_', 'V65', '_', 'V65', '_', '_', 'V43/V', 'vii-7', '_', '_', 'V7/IV', 'vii-43/V', 'Gr+6', 'V7', '_', 'V7/iv', 'Gr+6', 'vii=42/VII', 
-'V65', 'VI', '_', '_', '_', '_', '_', '_', 'V42', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'ii65', '_', 
-'vii-7/iii', 'V65/V', 'V', '_', '_', '_', '_', '_', 'ii65', 'IV6', '_', 'I6', '_', 'V7', '_', 'I64', 'V7', 'I', '_', '_', '_', 'ii6', 
-'_', '_', '_', 'IV', '_', '_', '_', 'V42', '_', 'VII', '_', 'I', '_', '_', '_', 'ii6', '_', 'V7', '_', 'I', '_', '_', '_', 'ii-6', '_', 
-'V7', '_', 'I', '_', '_', '_', 'V65', '_', 'I64', '_', 'I', '_', 'V7/V', '_', 'V65', '_', 'I', '_', 'IV6', '_', 'V65', '_', 'I', '_', 
-'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'iv', '_', '_', '_', 'iv', 
-'_', 'V65', '_', '_', 'V65', 'I', '_', 'V65/IV', '_', 'vii-43/iv', '_', 'ii-64', '_', 'V7', '_', 'vii-65', '_', 'VI/III', '_', '_', '_', 
-'_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'V', '_', '_', 'V7/III', 'I64', 'V7', 'V7', 'I', '_', 'ii65', '_', 'V', 'I', 'iv6', 
-'_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'I7', '_', '_', 'V7/ii', 'ii6', '_', 'V7', '_', 'I', '_', '_', '_', '_', '_', '_', 
-'_', 'V7', '_', '_', 'V42', 'I6', '_', 'V65', '_', 'IV', '_', 'V', '_', 'I', '_', 'ii6', '_', 'V7', '_', 'I', '_', 'iii6', '_', 'vii-43/V', 
-'_', 'V7', '_', 'I', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 'I', '_', 'I64', '_', 'I', '_', 'V7/IV', '_', 'IV', '_', 'I64', '_', 
-'I64', '_', 'i', '_', 'I6', '_', 'I', '_', 'VI', '_', 'I', '_', 'iv', '_', 'vi', '_', 'i64', '_', 'V65/iii', '_', 'vii-7/V', '_', 'V', '_', 
-'i', '_', 'V7', '_', '_', '_', 'i64', '_', 'V7', '_', '_', '_', 'I', '_', '_', '_']'''
-
 '''['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 
                             'IV6', '_', 'ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', '_', '_', 'I', '_', 
                             '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', '_', 
                             'IV', '_', 'I64', 'V7', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 
                             'I64', 'V', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 'I64', 'V', 
                             'I', '_', 'V42', '_', 'I', '_', 'V42', '_', 'I', 'V42', 'I', 'V42', 'I', '_', 
-                            '_', '_', 'I', '_', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 'I', 'V42/IV', 
-                            'vi7', 'V65', 'I', '_', '_', '_', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 
+                            '_', '_', 'I', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 'I', 'V42/IV', 
+                            'vi7', 'V65', 'I', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 
                             'I', 'V42/IV', 'vi7', 'V65', 'I', '_', 'ii6', '_', '_', '_', 'I6', '_', '_', 
                             '_', 'IV', '_', 'V', '_', 'I', '_', '_', '_', 'ii6', '_', '_', '_', 'V65/V', 
                             '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V7', '_', '_', '_', 
                             'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 'V', '_', '_', '_', 'I6', 'V42', 
                             'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 'V65', 'I', '_', '_', 
-                            'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I64', 'V', 'I', '_', 
-                            '_', '_', 'V43', '_', '_', '_', 'I', '_', '_', '_', 'V65', '_', '_', '_', 'I', 
-                            '_', '_', '_', 'V43/ii', '_', '_', '_', 'ii6', '_', 'V65/V', '_', 'V7', '_', 
-                            '_', '_', 'I64', '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V', 
-                            'I64', 'V', 'I64', 'V', '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', 
-                            '_', 'V42', 'I6', 'V64', 'I', 'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'ii6', 
-                            '_', 'I6', '_', 'ii6', '_', 'I64', 'V', 'I', '_', '_', '_', 'V43', '_', '_', '_', 
-                            'I', '_', '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', 
-                            '_', 'IV', '_', 'I64', 'V7', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 
-                            'I64', 'V', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 'I64', 'V', 'I', 
-                            '_', 'V42', '_', 'I', '_', 'V42', '_', 'I', 'V42', 'I', 'V42', 'I', '_', '_', '_', 
-                            'I', '_', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 'I', 'V42/IV', 'vi7', 'V65', 
-                            'I', '_', '_', '_', '_', '_', '_', 'I6', 'V64', 'I', 'V6', 'V', 'I', 'V42/IV', 'vi7', 
-                            'V65', 'I', '_', 'ii6', '_', '_', '_', 'I6', '_', '_', '_', 'IV', '_', 'V', '_', 'I', 
-                            '_', '_', '_', 'ii6', '_', '_', '_', 'V65/V', '_', '_', '_', 'V7', '_', '_', '_', 'I64', 
-                            '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 'V', 
-                            '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 
-                            'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'V', '_', 
-                            'I', '_', '_', '_', 'V43', '_', '_', '_', 'I', '_', '_', '_', 'V65', '_', '_', '_', 'I', 
-                            '_', '_', '_', 'V43/ii', '_', '_', '_', 'ii6', '_', 'V65/V', '_', 'V7', '_', '_', '_', 
-                            'I64', '_', '_', '_', 'V7', '_', '_', '_', 'I64', '_', '_', '_', 'V', 'I64', 'V', 'I64', 
-                            'V', '_', '_', '_', 'I6', 'V42', 'I6', 'V6', 'I', 'V6', 'V', '_', 'V42', 'I6', 'V64', 'I', 
-                            'V65', 'I', '_', '_', 'ii6', '_', 'I6', '_', 'I', '_', '_', '_']'''
+                            'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I64', 'V7', 'I', 
+                            '_', 'V43', '_', 'I', '_', 'V65', '_',  
+                            'I', '_', 'V7/IV', '_', 'IV', '_', 'I64', 'V7', 'I', '_', '_', '_']'''
+
+'''['I', 'IV', '_', 'ii6', 'I64', '_', 'V7', 'I', '_', '_', '_', 'V43', '_', '_', '_', 'I', '_', '_', '_', 'V42', '_', '_', '_', 'I6', 
+'_', '_', '_', 'ii6', '_', 'V', '_', 'I', '_', '_', '_', 'V42', '_', '_', '_', 'I6', '_', '_', '_', 'ii6', '_', 'V7', '_', 'I', '_', 
+'_', '_', 'V42', '_', '_', '_', 'I6', '_', '_', '_', 'ii6', '_', 'V7', '_', 'I', '_', 'V42', '_', 'I', '_', '_', '_', 'V7', '_', 'I',
+ '_', 'I', '_', '_', '_', 'V7/IV', '_', 'V42', '_', 'I', '_', '_', '_', 'V65', '_', 'I', '_', 'V42', '_', '_', '_', 'I', '_', 'V7', 
+'_', 'I', '_', '_', '_', 'I', '_', 'V', '_', 'I', '_', '_', '_', 'V/V', '_', '_', '_', 'vii-/V', '_', '_', 'V7', 'V7', '_', '_', '_', 
+'I', '_', '_', 'V7', 'I', '_', '_', 'V43', '_', '_', '_', '_', '_', 'V65', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'I', 
+'_', '_', 'V65', '_', '_', 'V7', '_', '_', 'I', '_', '_', 'I', '_', '_', 'V65', '_', '_', 'V7', '_', '_', 'I', '_', '_', 'V', '_', '_', 
+'vi', '_', '_', 'V42/V', '_', '_', 'V7', '_', '_', '_', '_', '_', 'vii-42', '_', '_', 'V7', '_', 'V42', 'I6', '_', 'I', 'V7', '_', '_', 
+'vii-42', '_', '_', 'V7', '_', 'V42', 'I6', '_', 'I', 'IV', '_', 'ii6', 'I64', '_', 'V7', 'I', '_', '_', 'V43', '_', '_', 'I6', '_', '_', 
+'V43', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'IV', '_', '_', 'ii6', '_', '_', 'V7', '_', '_', '_', 'I', '_', 
+'_', '_']'''
+
 
 def roman_to_int(roman):
         roman_numerals = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7,
@@ -111,7 +89,6 @@ def analyze_chord_symbol(chord_symbol, index, duration_check):
         else:
             break
      
-    
     if chord_symbol == "_":
         return "", "", "", "", ""
 
@@ -337,7 +314,8 @@ def choose_alto_and_tenor(alto_and_tenor_choices):
     
 # Define the four-part harmonization rules
 
-def harmonize_chord(chord, soprano_midi, quality):
+# duration in quarter notes
+def harmonize_chord(chord, soprano_seed, quality, duration):
     soprano_choices = []
     alto_and_tenor_choices = []
     bass_choices = []
@@ -354,8 +332,7 @@ def harmonize_chord(chord, soprano_midi, quality):
             unused_chord_members.append(chord[i].name)
     
     
-    # temporary assignment of voices
-    soprano_note = chord[-1]
+    # temporary assignment of bass voice
     bass_note = chord[0]
     
     # get bass note
@@ -380,22 +357,25 @@ def harmonize_chord(chord, soprano_midi, quality):
         for i in range(-3, 0):
             for j in range(-2, 3):
                 soprano_choices.append(chord[i].pitch.midi + (j*12))
-            
     else:
         if len(half_used_chord_members) > 0: 
             for i in range (-2, 1):
                 for j in range(-2, 3):
                     soprano_choices.append(chord[i].pitch.midi + (j*12))
-                    
         else: 
             for i in range (-2, 0):
                 for j in range(-2, 3):
                     soprano_choices.append(chord[i].pitch.midi + (j*12))
                     
-                    
-    filtered_soprano_choices = [value for value in soprano_choices if (64 <= value <= 80)]
+    filtered_soprano_choices = [value for value in soprano_choices if (60 <= value <= 80)]
     
-    soprano_note.pitch = pitch.Pitch(closest_number(filtered_soprano_choices, soprano_midi))
+    # generate soprano melody
+    
+    mg = MelodyGenerator()
+    
+    soprano_melody, soprano_note_midi = mg.generate_melody_to_match_chord_progression(soprano_seed, SEQUENCE_LENGTH, duration, filtered_soprano_choices, 0.3)
+    
+    soprano_note = note.Note(soprano_note_midi)
     
     # doubling rules for soprano
     if quality[-1] == '7':
@@ -409,23 +389,184 @@ def harmonize_chord(chord, soprano_midi, quality):
             unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]
         else: 
             half_used_chord_members.append(soprano_note.name)
-            
+    
     # fix some doubling rules
     if double == 0:
         if quality[-1] != '7':
             if len(unused_chord_members) == 1:
                 if not (bass_note.name == 'C' or bass_note.name == 'F' or bass_note.name == 'G'):
                     unused_chord_members.append(bass_note.name)
-    
-    # alto and tenor choices
+            
+    # alto and tenor choices        
     for i in range(len(unused_chord_members)):
         for j in range(-2, 2):
             alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
-                
-    return soprano_note, alto_note, tenor_note, bass_note
+                     
+    return soprano_melody, alto_note, tenor_note, bass_note
+    
+def reverse_numbers_in_string(seed):
+    
+    new_string = ""
+    current_number = ""
 
+    for char in seed:
+        if char.isdigit():
+            current_number += char
+        else:
+            if current_number:
+                if len(current_number) == 2:
+                    new_string += current_number[::-1]
+                else:
+                    new_string += current_number
+                current_number = ""
+            new_string += char
+
+    if current_number and len(current_number) == 2:
+        new_string += current_number[::-1]
+    else:
+        new_string += current_number
+
+    return new_string
+
+def get_soprano_seed(soprano, soprano_seed, time_step = 0.25):
+    
+    # get last 64 sixteenth note events for melodygenerator to get next notes
+    
+    seed = []
+    seed_length = 0
+    total_steps = 0
+    
+    for event in reversed(soprano.flat.notesAndRests):
+        if isinstance(event, note.Note):
+            symbol = event.pitch.midi # 60
+            # handle rests
+        elif isinstance(event, note.Rest):
+            symbol = "r"
+            
+            # convert the note/rest into time series notation
+        steps = int(event.duration.quarterLength / time_step)
+        seed_length += steps
+        
+        if seed_length < SEQUENCE_LENGTH:
+            for step in range(steps):
+                if step == (steps - 1):
+                    seed.append(symbol)
+                else:
+                    seed.append("_")
+        else:
+            for step in range(SEQUENCE_LENGTH - total_steps):
+                if step == SEQUENCE_LENGTH - total_steps - 1:
+                    seed.append(symbol)
+                else:
+                    seed.append("_")
+            reversed_encoded_seed = " ".join(map(str, seed))
+            
+            encoded_seed = reverse_numbers_in_string(reversed_encoded_seed[::-1])  # @UnusedVariable
+            
+        total_steps += steps
+        
+    reversed_encoded_seed = " ".join(map(str, seed))
+            
+    encoded_seed = reverse_numbers_in_string(reversed_encoded_seed[::-1])
+    
+    # append starting seed to encoded seed if encoded seed is not long enough
+    if(total_steps < SEQUENCE_LENGTH):
+        encoded_seed = ' '.join([soprano_seed, encoded_seed])
+    
+    # lower notes above C5 an octave so melodygenerator understands seed better
+    altered_seed = []
+    i = 0
+    while i < len(encoded_seed):
+        if encoded_seed[i:i + 2].isdigit():
+            number = int(encoded_seed[i:i + 2])
+            if number > 72:
+                number -= 12
+                while number > 72:
+                    number -= 12  
+                altered_seed.append(str(number))
+            else:
+                altered_seed.append(encoded_seed[i:i + 2])
+            i += 2  # Move the index by 2 to skip the processed two-digit number
+        else:
+            altered_seed.append(encoded_seed[i])
+            i += 1  # Move the index by 1 for non-numeric characters
+    
+    # print(''.join(altered_seed))
+    return ''.join(altered_seed)
+
+def fix_range(soprano_melody):
+    number_soprano_melody = []
+
+    i = 0
+    while i < len(soprano_melody):
+        if str(soprano_melody[i]).isdigit():
+            num = soprano_melody[i]
+            count = 0
+
+            while i + 1 < len(soprano_melody) and soprano_melody[i + 1] == '_':
+                count += 1
+                i += 1
+
+            number_soprano_melody.extend([num] * (count + 1))
+        i += 1
+    
+    
+    number_soprano_melody = [int(num) for num in number_soprano_melody]
+    
+    total = sum(number_soprano_melody)
+    average = int(total / len(number_soprano_melody))
+    
+    altered_soprano_melody = []
+    
+    # if majority of melody is under F4, raise an octave
+    if average < 65:
+        for item in soprano_melody:
+            if re.match(r'^[-+]?\d*$', item):  # Check if the item is a numeric string
+                number = int(item)
+                number += 12
+                altered_soprano_melody.append(str(number))
+            else:
+                altered_soprano_melody.append(item)
+                
+        
+        return altered_soprano_melody
+    
+    return soprano_melody
+
+def append_soprano_melody(soprano, soprano_melody, step_duration = 0.25):
+    
+    start_symbol = None
+    step_counter = 1
+    
+    for i, symbol in enumerate(soprano_melody): 
+        # handle case in which we have a note/rest
+        if symbol != "_" or i + 1 == len(soprano_melody):
+            # ensure we're not dealing with note/rest beyond the first symbol
+            if start_symbol is not None: 
+                quarter_length_duration = step_duration * step_counter # 0.25 * 4
+                        
+                # handle rest
+                if start_symbol == "r":
+                    m21_event = note.Rest(quarterLength = quarter_length_duration)
+                        
+                # handle note
+                else:
+                    m21_event = note.Note(int(start_symbol), quarterLength = quarter_length_duration)
+                        
+                soprano.append(m21_event)
+                        
+                # reset step counter
+                step_counter = 1
+                        
+            start_symbol = symbol
+        # handle case in which we have a prolongation sign "_"
+        else:
+            step_counter += 1
+            
+    return soprano
+                    
 def main():
     
     # Create a stream for the four parts   
@@ -434,26 +575,29 @@ def main():
     tenor = stream.Part()
     bass = stream.Part()
     index = 0
+    chord_index = 0
     
     # Create a XML file and add the four parts
     xml_stream = stream.Score()
-    
-    soprano_midi = 72
     
     for chord_name in symbol_chord_progression:
         
         degree, quality, inversion, secondary_dominant_numeral, duration = analyze_chord_symbol(chord_name, index, symbol_chord_progression)
         
         if quality != "":
-            # set notes
-            chord_notes = chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral))
-            soprano_note, alto_note, tenor_note, bass_note = harmonize_chord(chord_notes, soprano_midi, quality)
             
-            # smooth melody line
-            soprano_midi = soprano_note.pitch.midi
+            # set seed
+            if index == 0:
+                soprano_seed = soprano_beginning_seed
+            else:
+                soprano_seed = get_soprano_seed(soprano, soprano_beginning_seed)
+            
+            
+            # set notes and soprano melody
+            chord_notes = chord.Chord(chord_to_midi(degree, quality, inversion, secondary_dominant_numeral))
+            soprano_melody, alto_note, tenor_note, bass_note = harmonize_chord(chord_notes, soprano_seed, quality, duration)
             
             # set note lengths
-            soprano_note.quarterLength = duration
             alto_note.quarterLength = duration
             tenor_note.quarterLength = duration
             bass_note.quarterLength = duration
@@ -461,12 +605,33 @@ def main():
             # add chord under bass note
             bass_note.lyric = chord_name
             
-            soprano.append(soprano_note)
+            # signal end of each chord so soprano melody ends correctly
+            soprano_melody.append("/")
+            
+            altered_soprano_melody = fix_range(soprano_melody)
+            
+            # last soprano melody changed to only one note
+            if chord_index == len(symbol_chord_progression) - duration:
+                altered_soprano_melody = [altered_soprano_melody[0]] + ['_' for _ in range(1, len(altered_soprano_melody))]
+                altered_soprano_melody[-1] = '/'
+            
+            print()
+            print("soprano melody: " + str(altered_soprano_melody))
+            print()
+            print(str(int(float((chord_index + duration) / len(symbol_chord_progression)) * 100)) + "% complete")
+            
+            # append soprano melody
+            soprano = append_soprano_melody(soprano, altered_soprano_melody)
+            
+            print ("-" * 80) 
+                
+            # append other voices
             alto.append(alto_note)
             tenor.append(tenor_note)
             bass.append(bass_note)
         
         index += 1
+        chord_index += 1
     
     # Add the parts to the XML stream
     xml_stream.insert(0, soprano)
@@ -475,7 +640,7 @@ def main():
     xml_stream.insert(0, bass)
     
     # Save the XML file
-    xml_stream.write('xml', fp='harmony.xml')
+    xml_stream.write('xml', fp='harmonywithmelody.xml')
 
 if __name__ == "__main__":
     main()
