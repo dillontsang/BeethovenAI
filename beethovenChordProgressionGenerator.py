@@ -79,8 +79,20 @@ class ChordProgressionGenerator:
         
 if __name__ == "__main__":
     cpg = ChordProgressionGenerator()
-    seed = "I _ I6 _ V7 _ I _ _ _ V7/IV _ IV _ IV6 _ ii7 _ V65 _ I _"
+    
+    seed = "I _ _ _ I6 _ _ _ V7 _ I _ _ _ V7/IV _ IV _ IV6 _ ii7 _ V65 _ I _"
+    seed2 = "I ii6 _ _ _ V7 _ _ _ I _ IV _ I6 _ IV6 _ I64 _"
+    seed3 = "I _ _ _ V _ _ _ vi _ _ _ V42/V _ V7 _"
+    seed4 = "I _ _ _ ii6 _ _ _ V43 _ _ _ I _ _ _"
+    seed5 = "I _ _ IV I _ V7/ii ii V7 _ _ _ I _"
+    seed6 = "I IV _ ii6 I64 _ V7 I _ _ _ V43 _ _ _"
+    seed7 = "I _ _ _ V43/V _ V7 _ I _ _ _"
+    seed8 = "I _ IV _ V _ I _ _ _"
+    seed9 = "I _ _ IV6 _ _ ii6 _ _ V7 _ _ I _ _"
+    seed10 = "i _ _ _ _ _ _ _ _ V65 _ _ _ _ _ _ _ i _ _ _ V43 _ _ _ i6 _ ii-6 _ V"
+    
     
     # temperature is hyperparameter
-    chordProgression = cpg.generate_chord_progression(seed, 250, SEQUENCE_LENGTH, 0.3)
+    # 0.4 might be sweet spot?
+    chordProgression = cpg.generate_chord_progression(seed, 400, SEQUENCE_LENGTH, 0.3)
     print(chordProgression)      
