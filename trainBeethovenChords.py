@@ -6,13 +6,13 @@ Created on Aug 18, 2023
 import tensorflow.keras as keras
 from beethovenchordprogressionpreprocess import generate_training_sequences, SEQUENCE_LENGTH
 
-OUTPUT_UNITS = 164
-NUM_UNITS = [256]
+OUTPUT_UNITS = 190
+NUM_UNITS = [512]
 LOSS = "sparse_categorical_crossentropy"
 LEARNING_RATE = 0.001
-EPOCHS = 50 # hyperparameter
+EPOCHS = 25 # hyperparameter
 BATCH_SIZE = 64
-SAVE_MODEL_PATH = "beethovenmodel.h5"
+SAVE_MODEL_PATH = "beethovenmodel4.h5"
 
 def build_model(output_units, num_units, loss, learning_rate):
     
