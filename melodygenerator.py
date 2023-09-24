@@ -7,11 +7,12 @@ import json
 import numpy as np
 import tensorflow.keras as keras
 import music21 as m21
-from preprocess import SEQUENCE_LENGTH, MAPPING_PATH
+from beethovenmelodypreprocess import SEQUENCE_LENGTH, MAPPING_PATH
+# from preprocess import SEQUENCE_LENGTH, MAPPING_PATH
 
 class MelodyGenerator:
     
-    def __init__(self, model_path="model.h5"):
+    def __init__(self, model_path="beethovenmelodymodel.h5"):
         
         self.model_path = model_path
         self.model = keras.models.load_model(model_path)
