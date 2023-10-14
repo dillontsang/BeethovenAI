@@ -8,18 +8,16 @@ import itertools
 
 # Define the chord progression
 
-symbol_chord_progression = ['I', '_', 'V7', '_', 'I64', '_', 'V6', '_', 'I', '_', 'Gr+6', '_', '_', '_', 'I64', '_', '_', '_', 'V7', '_', '_', '_', '_', '_', '_', '_', 'I64', '_', '_', 
-'_', '_', '_', '_', '_', '_', 'V6', '_', '_', '_', '_', '_', 'V6', '_', '_', '_', '_', '_', 'I', '_', '_', 'I6', '_', '_', 'IV', '_', '_', 'vii-/V', 
-'_', '_', 'I64', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', 'I6', '_', '_', '_', '_', 'V43/IV', 'IV', '_', '_', 'vii-/V', '_', '_', 'V7', '_', 
-'I', '_', '_', '_', '_', '_', 'I6', 'ii65', '_', 'V43', '_', '_', 'I', '_', '_', 'ii65', '_', '_', '_', '_', '_', 'V43', '_', '_', 'I', '_', '_', 'ii65', 
-'_', '_', 'I6', '_', '_', 'V43', '_', '_', 'I', '_', '_', 'V43', '_', '_', 'I', '_', '_', 'V43', '_', '_', 'I', '_', '_', 'V43', '_', '_', 'I', '_', '_', 
-'_', '_', '_', '_', '_', '_', '_', '_', '_', 'V7/vi', '_', '_', 'vi', '_', '_', 'V7/vi', '_', '_', 'vi', '_', '_', 'V7/ii', '_', '_', 'ii', '_', '_', 'I64', 
-'_', 'V7', 'I', '_', '_', 'V/vi', '_', '_', 'V65', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'vii-7/V', '_', '_', 'vi6', '_', '_', 'ii', '_', '_', 
-'I64', '_', 'V7', 'I', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 'IV6', '_', '_', 'vi6', '_', '_', '_', '_', '_', 
-'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', 
-'_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', 
-'IV6', '_', '_', 'vi6', '_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', 
-'_', '_', 'V7', '_', '_', 'I', '_', '_', '_', '_', '_', '_', '_', '_', 'V7', '_', '_', 'I', '_', '_', '_']
+symbol_chord_progression = ['I', '_', 'V42/V', '_', 'vi', '_', '_', '_', 'v', '_', '_', '_', 'V7/VI', '_', 'VI', 'ii', 'V', '_', '_', '_', 
+'V', '_', '_', '_', 'V42', '_', '_', '_', 'V7/V', '_', '_', '_', 'V', '_', '_', '_', 'V7', '_', '_', '_', 'I', 
+'_', '_', '_', '_', '_', 'V43', '_', 'I', '_', 'V43', '_', 'I', '_', 'ii65', '_', 'V', '_', 'I', '_', 'I64', '_', 
+'V/V', '_', 'V65', '_', 'I', '_', 'I64', '_', 'V/V', '_', 'V65', '_', 'I', '_', 'vi6', '_', 'V/V', '_', 'V7/vi', 
+'_', 'V7/ii', '_', 'V7/V', '_', 'V7/IV', '_', 'IV', '_', 'V7/V', '_', 'V7', '_', '_', '_', 'I', '_', 'V65', 'I', 
+'V7', '_', '_', '_', 'I', '_', 'V65', 'I', 'V', '_', '_', '_', '_', '_', '_', '_', 'i', '_', '_', '_', 'V42/V', 
+'_', '_', '_', 'V65', '_', '_', '_', 'V42/iv', '_', '_', '_', 'iv6', '_', 'i64', '_', 'V7', '_', '_', '_', 'i', 
+'_', '_', '_', 'V42/V', '_', '_', '_', 'V65', '_', '_', '_', 'V42/V', '_', '_', '_', 'iv6', '_', 'i64', '_', 'V7',
+ '_', '_', '_', 'i', '_', '_', '_', 'i', '_', '_', '_', 'V65', '_', '_', '_', 'V42/V', '_', '_', '_', 'V65', '_',
+ '_', '_', 'I', '_', '_', '_', 'V7', '_', '_', '_', 'I', '_', '_', '_']
 
 '''['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 
                             'IV6', '_', 'ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', '_', '_', 'I', '_', 
@@ -371,6 +369,7 @@ def harmonize_chord(chord, soprano_midi, quality):
     
     # doubling rules for soprano
     if quality[-1] == '7':
+        print(7)
         unused_chord_members = [item for item in unused_chord_members if item != soprano_note.name]     
     else:
         if soprano_note.name == bass_note.name:
@@ -390,19 +389,26 @@ def harmonize_chord(chord, soprano_midi, quality):
                     unused_chord_members.append(bass_note.name)
     
     # alto and tenor choices
-    if(len(half_used_chord_members) != 2):
-        for i in range(len(unused_chord_members)):       
-            for j in range(-2, 2):
-                alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
+    if(quality[-1] != '7'):
+        if(len(half_used_chord_members) != 2):
+            for i in range(len(unused_chord_members)):       
+                for j in range(-3, 3):
+                    alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
+        else:
+            if(unused_chord_members[2] == 'C'): # very specific scenario to avoid strange doubling of I chord
+                for i in range(1, 3): 
+                    for j in range(-3, 3):
+                        alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
+            else:   
+                for i in range(len(unused_chord_members) - 1):       
+                    for j in range(-3, 3):
+                        alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
     else:
-        if(unused_chord_members[2] == 'C'): # very specific scenario to avoid strange doubling of I chord
-            for i in range(1, 3): 
-                for j in range(-2, 2):
+        for i in range(len(unused_chord_members)):       
+                for j in range(-3, 3):
                     alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
-        else:   
-            for i in range(len(unused_chord_members) - 1):       
-                for j in range(-2, 2):
-                    alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
+                    
+    print(unused_chord_members)
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
                 

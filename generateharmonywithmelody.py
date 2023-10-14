@@ -25,7 +25,8 @@ soprano_beginning_seed = "72 _ _ _ 76 _ _ _ 79 _ _ _ 74 _ _ _ 77 _ _ _ 76 _ _ _ 
 
 # Define the chord progression
 
-symbol_chord_progression = ['ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 
+symbol_chord_progression = ['I', '_', 'I6', '_', 'V7', '_', 'I', '_', 'I', '_', 'V7/IV', '_', 'IV', '_', 
+                            'IV6', '_', 'ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 
                             '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', '_', 
                             'IV', '_', 'I64', 'V7', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 
                             'I64', 'V', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 'I64', 'V', 
@@ -41,8 +42,7 @@ symbol_chord_progression = ['ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '
                             '_', 'V43', '_', 'I', '_', 'V65', '_',
                             'I', '_', 'V7/IV', '_', 'IV', '_', 'I64', 'V7', 'I', '_', '_', '_']
 
-'''['I', '_', 'I6', '_', 'V7', '_', 'I', '_', '_', '_', 'V7/IV', '_', 'IV', '_', 
-                            'IV6', '_', 'ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 
+'''['ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '_', 
                             '_', '_', 'V65', '_', '_', '_', 'I', '_', '_', '_', 'V7/IV', '_', '_', '_', 
                             'IV', '_', 'I64', 'V7', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 
                             'I64', 'V', 'I', '_', '_', '_', 'IV', '_', '_', '_', 'I', 'ii6', 'I64', 'V', 
@@ -57,6 +57,8 @@ symbol_chord_progression = ['ii7', '_', 'V65', '_', 'I', '_', 'V65', '_', 'I', '
                             'ii6', '_', 'I6', '_', 'ii6', '_', 'I6', '_', 'ii6', '_', 'I64', 'V7', 'I', 
                             '_', 'V43', '_', 'I', '_', 'V65', '_',
                             'I', '_', 'V7/IV', '_', 'IV', '_', 'I64', 'V7', 'I', '_', '_', '_']'''
+
+
 
 '''['I', 'IV', '_', 'ii6', 'I64', '_', 'V7', 'I', '_', '_', '_', 'V43', '_', '_', '_', 'I', '_', 'V42', '_', '_', '_', 'I6', 
 '_', '_', '_', 'ii6', '_', 'V', '_', 'I', '_', '_', '_', 'V42', '_', '_', '_', 'I6', '_', '_', '_', 'ii6', '_', 'V7', '_', 'I', '_', 
@@ -440,18 +442,23 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
                     unused_chord_members.append(bass_note.name)
             
     # alto and tenor choices        
-    if(len(half_used_chord_members) != 2):
-        for i in range(len(unused_chord_members)):       
-            for j in range(-2, 2):
-                alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
-    else:
-        if(unused_chord_members[2] == 'C'): # very specific scenario to avoid strange doubling of I chord
-            for i in range(1, 3): 
-                for j in range(-2, 2):
+    if(quality[-1] != '7'):
+        if(len(half_used_chord_members) != 2):
+            for i in range(len(unused_chord_members)):       
+                for j in range(-3, 3):
                     alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
-        else:   
-            for i in range(len(unused_chord_members) - 1):       
-                for j in range(-2, 2):
+        else:
+            if(unused_chord_members[2] == 'C'): # very specific scenario to avoid strange doubling of I chord
+                for i in range(1, 3): 
+                    for j in range(-3, 3):
+                        alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
+            else:   
+                for i in range(len(unused_chord_members) - 1):       
+                    for j in range(-3, 3):
+                        alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
+    else:
+        for i in range(len(unused_chord_members)):       
+                for j in range(-3, 3):
                     alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
             
     alto_note, tenor_note = choose_alto_and_tenor(alto_and_tenor_choices)
