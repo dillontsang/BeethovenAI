@@ -242,6 +242,9 @@ def analyze_chord_symbol(chord_symbol, index, duration_check):
         
     # TODO: Flat seven, secondary dominant for special chords
     
+    if(roman_numeral == 'VI'):
+        quality = "major6"
+    
     print("chord symbol: " + chord_symbol)
     print()
     print("roman numeral: " + str(roman_to_int(roman_numeral)))
@@ -288,6 +291,7 @@ def chord_to_midi(degree, quality, inversion, secondary_dominant_numeral):
             'm': [0, 3, 7],
             'd': [0, 3, 6],
             'a': [0, 4, 8],
+            'major6': [-1, 3, 6], # fix root of VI chord in a minor context
             'D7': [0, 4, 7, 10],
             'M7': [0, 4, 7, 11],
             'm7': [0, 3, 7, 10],
