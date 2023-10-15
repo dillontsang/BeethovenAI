@@ -449,7 +449,7 @@ def harmonize_chord(chord, soprano_seed, quality, duration):
                     alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
         else:
             if(unused_chord_members[2] == 'C'): # very specific scenario to avoid strange doubling of I chord
-                for i in range(1, 3): 
+                for i in range(0, 2): 
                     for j in range(-3, 3):
                         alto_and_tenor_choices.append(note.Note(unused_chord_members[i]).pitch.midi + (j*12))
             else:   
